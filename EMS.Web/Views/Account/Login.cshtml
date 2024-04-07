@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_loginLayout .cshtml";
+}
+@model EMS.Entities.Models.LoginDTO
+
+<style>
+    /* Add your CSS styles here */
+</style>
+
+<div class="container">
+    <form asp-action="Login">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <h1>Login Form</h1>
+        <div class="form-group">
+            <label asp-for="Policy">Policy</label>
+            <input asp-for="Policy" class="form-control" />
+            <span asp-validation-for="Policy" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="UserName">Username</label>
+            <input asp-for="UserName" class="form-control" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password">Password</label>
+            <input asp-for="Password" type="password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="btn-container">
+            <button type="submit" class="btn btn-primary">Login</button>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary login-btn">
+                Sign Up
+            </a>
+        </div>
+    </form>
+</div>

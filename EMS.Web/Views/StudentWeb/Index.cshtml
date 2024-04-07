@@ -1,0 +1,167 @@
+﻿ @model List<Student> // Assuming your API returns a list of Student objects
+
+@{
+    ViewData["Title"] = "Index";
+
+}
+<div class="container ">
+    <div class="row">
+        <div class="text-primary col-md-6">
+            <h1> Student  Detail</h1>
+        </div>
+
+        <div class="col-md-12" style="text-align:right;">
+            <a asp-action="Create" class="btn btn-primary float-right"> <i class="bi bi-plus-circle"></i> &nbsp;Create</a>
+        </div>
+        
+
+
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Roll No</th>
+                <th>Name</th>
+                <th>Father Name</th>
+                <th>Class Name</th>
+                <th>Address</th>
+                <th>Mobile No</th>
+                <th>Email</th>
+                <th>DOB</th>
+                <th>Fee</th>
+                 <th colspan="3" class="text-center">Actions</th>
+                        
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model)
+            {
+                <tr>
+                    <td>@student.RollNo</td>
+                    <td>@student.Name</td>
+                    <td>@student.FatherName</td>
+                    <td>@student.ClassName</td>
+                    <td>@student.Address</td>
+                    <td>@student.MobileNo</td>
+                    <td>@student.Email</td>
+                    <td>@student.DOB</td>
+                    <td>@student.Fee</td>
+      
+                            <td>
+                                <form id="deleteForm_@student.RollNo" method="post" asp-action="Delete" asp-route-rollno="@student.RollNo" onsubmit="return confirmDelete()">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
+                            <td>
+                                <a asp-action="Edit" class="btn btn-danger" asp-route-rollno="@student.RollNo">Edit</a>
+                            </td>
+                            <td>
+                                <a asp-action="Details" class="btn btn-danger"  asp-route-rollno="@student.RollNo">Details</a>
+                            </td>
+                        </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No data available from the API.</p>
+}
+        @section Scripts {
+            <script>
+                function confirmDelete() {
+                    return confirm("Are you sure you want to delete this student?");
+                }
+            </script>
+        }
+ 
+ @* @model List<Student>
+
+@{
+    ViewData["Title"] = "Index";
+
+}
+
+<div class="container ">
+    <div class="row">
+        <div class="text-primary col-md-6">
+            <h1> Student  Detail</h1>
+        </div>
+
+        <div class="col-md-12" style="text-align:right;">
+            <a asp-action="Create" class="btn btn-primary float-right"> <i class="bi bi-plus-circle"></i> &nbsp;Create</a>
+        </div>
+
+
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="mr-2  text-primary">Filter by Class:</label>
+                <select id="classFilter" class="form-control mr-2">
+                    <option value="">All Classes</option>
+                    <!-- Add options for each unique class name -->
+                    @foreach (var className in Model.Select(s => s.ClassName).Distinct())
+                    {
+                        <option value="@className">@className</option>
+                    }
+                </select>
+                <button class="btn btn-info" onclick="filterByClass()">Apply Filter</button>
+            </div>
+        </div>
+        <br /><br />
+        <div>
+            <table class="table table-striped border-round border-5 text-primary">
+
+                <tr>
+                    <th class="text-primary"> Roll No</th>
+                    <th class="text-primary"> Name</th>
+                    <th class="text-primary">Father Name</th>
+                    <th class="text-primary">Class Name</th>
+                    <th class="text-primary">Fee</th>
+                    <th class="text-primary">Address</th>
+                    <th class="text-primary">Mobile NO</th>
+                    <th class="text-primary">Email</th>
+                    <th class="text-primary">DOB</th>
+                    <th class="text-primary">Pics of Student</th>
+                    <th class="text-primary">Actions</th>
+                </tr>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td style="color:#FFFFFF">@item.RollNo</td>
+                        <td style="color:#FFFFFF">@item.Name</td>
+                        <td style="color:#FFFFFF">@item.FatherName</td>
+                        <td style="color:#FFFFFF">@item.ClassName</td>
+                        <td style="color:#FFFFFF">@item.Fee</td>
+                        <td style="color:#FFFFFF">@item.Address</td>
+                        <td style="color:#FFFFFF">@item.MobileNo</td>
+                        <td style="color:#FFFFFF">@item.Email</td>
+                        <td style="color:#FFFFFF">@item.DOB</td>
+
+
+                        @*  <td>
+                    <a asp-controller="Student" asp-action="Edit" asp-route-id="@item.RollNo" class="btn btn-primary mx-3"><i class="bi bi-pencil-square"></i>Edit</a>
+                    </td>
+                    <td>
+                    <a asp-controller="Student" asp-action="Delete" asp-route-id="@item.RollNo" class="btn btn-danger mx-3"><i class="bi bi-trash-fill"></i>Delete</a>
+                    </td> *@
+                        @* <td>
+                            @Html.ActionLink("Edit", "Edit", new { item.RollNo }, new { @class = "btn btn-info" })
+                            @Html.ActionLink("Delete", "Delete", new { item.RollNo }, new { @class = "btn btn-danger", onclick = "return confirm('Do you  want to Delete this Record')" })
+                        </td>
+
+
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    function filterByClass() {
+        var selectedClass = $("#classFilter").val();
+        window.location.href = "/Student/Index?className=" + selectedClass;
+    }
+</script>
+  *@ 
