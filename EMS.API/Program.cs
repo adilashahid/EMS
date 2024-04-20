@@ -57,33 +57,51 @@ builder.Services.AddTransient<ITeacherBusiness, TeacherBusiness>();
 #region Repositories services 
 builder.Services.AddTransient<IStudentRepository, StudentRepository>();
 builder.Services.AddTransient<ITeacherRepository, TeacherRepository>();
+builder.Services.AddTransient<ILoginRepository, LoginRepository>();
+
 #endregion
 
 
 
-var JWTsecretForLocal = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTsecretForLocal"));
-string LocalAudience = builder.Configuration.GetValue<string>("LocalAudience");
+//var JWTsecretForLocal = Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTsecretForLocal"));
+//string LocalAudience = builder.Configuration.GetValue<string>("LocalAudience");
 
-string LocalIssur = builder.Configuration.GetValue<string>("LocalIssur");
+//string LocalIssur = builder.Configuration.GetValue<string>("LocalIssur");
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-}).AddJwtBearer("LoginForLocalUsers", options =>
-{
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(JWTsecretForLocal),
-        ValidateIssuer = true,
-        ValidIssuer = LocalIssur,
-        ValidateAudience = true,
-        ValidAudience = LocalAudience
-    };
-});
+//}).AddJwtBearer("LoginForLocalUsers", options =>
+//{
+//    options.SaveToken = true;
+//    options.TokenValidationParameters = new TokenValidationParameters()
+//    {
+//        ValidateIssuerSigningKey = true,
+//        IssuerSigningKey = new SymmetricSecurityKey(JWTsecretForLocal),
+//        ValidateIssuer = true,
+//        ValidIssuer = LocalIssur,
+//        ValidateAudience = true,
+//        ValidAudience = LocalAudience
+//    };
+//});
+var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
+var jwtSecret = jwtSettingsSection.GetValue<string>("Secret");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        //ValidIssuer = jwtSettingsSection.GetValue<string>("Issuer"),
+                        //ValidAudience = jwtSettingsSection.GetValue<string>("Audience"),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
+                    };
+                });
 
 var app = builder.Build();
 

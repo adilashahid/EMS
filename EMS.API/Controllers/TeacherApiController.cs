@@ -7,7 +7,7 @@ namespace EMS.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "LoginForLocalUsers", Roles = "Superadmin,Admin")]
+    [Authorize]
     public class TeacherApiController : ControllerBase
     {
         private readonly ITeacherBusiness _teacherBusiness;

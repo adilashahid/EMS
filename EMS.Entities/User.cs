@@ -5,15 +5,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EMS.Entities.Models
+namespace EMS.Entities
 {
-    public class LoginDTO
+    public class User
     {
 
-        
+
+        [Key]
+        public int UserId { get; set; }
+
         [Required]
-        public string UserName { get; set; }
+        public string Username { get; set; }
+
         [Required]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
     }
 }

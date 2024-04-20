@@ -1,0 +1,16 @@
+﻿@model EMS.Entities.Models.LoginDTO
+
+<form asp-action="Signup" method="post">
+    <div>
+        <label asp-for="UserName">Username:</label>
+        <input asp-for="UserName" />
+        <span asp-validation-for="UserName"></span>
+    </div>
+    <div>
+        <label asp-for="Password">Password:</label>
+        <input asp-for="Password" type="password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+    <button type="submit">Signup</button>
+</form>
+

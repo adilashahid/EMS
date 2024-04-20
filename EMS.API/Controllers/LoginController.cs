@@ -1,4 +1,6 @@
-﻿using EMS.Entities.Models;
+﻿using EMS.DAL.Interfaces;
+using EMS.DAL.Repository;
+using EMS.Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,56 +17,49 @@ namespace EMS.API.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public LoginController(IConfiguration configuration)
+        private readonly ILoginRepository _loginRepository;
+    
+        public LoginController(IConfiguration configuration, ILoginRepository loginRepository)
         {
             _configuration = configuration;
-        }
-        [HttpPost]
-        public ActionResult Login(LoginDTO model)
+            _loginRepository = loginRepository;
+            }
+
+        [HttpPost("login")]
+        public async Task<ActionResult> Login(LoginDTO model)
         {
-            if (!ModelState.IsValid)
+            if (await _loginRepository.AuthenticateAsync(model.UserName, model.Password))
             {
-                return BadRequest("Please provide username and password");
-            }
-            LoginResponseDTO response = new() { UserName = model.UserName };
-            string audience = string.Empty;
-            string issuer = string.Empty;
-            byte[] key = null;
-            if (model.Policy == "Local")
-            {
-                issuer = _configuration.GetValue<string>("LocalIssur");
-                audience = _configuration.GetValue<string>("LocalAudience");
-                key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWTsecretForLocal"));
-            }
-            
-            if (model.UserName == "Adila" && model.Password == "Adila123")
-            {
-
-
-                var tokenhandler = new JwtSecurityTokenHandler();
-                var Tokendiscripter = new SecurityTokenDescriptor()
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:Secret"]);
+                var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Issuer = issuer,
-                    Audience = audience,
-                    Subject = new System.Security.Claims.ClaimsIdentity(new Claim[]
+                    Subject = new ClaimsIdentity(new Claim[]
                     {
                         new Claim(ClaimTypes.Name, model.UserName),
-                        new Claim(ClaimTypes.Role, "Admin")
+                        // Add additional claims if needed
                     }),
-                    Expires = DateTime.Now.AddDays(4),
-                    SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+                    Expires = DateTime.UtcNow.AddHours(1), // Set token expiration time
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
-                var token = tokenhandler.CreateToken(Tokendiscripter);
-                response.Token = tokenhandler.WriteToken(token);
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                return Ok(new { Token = tokenHandler.WriteToken(token) });
             }
-            else
-            {
-                return Ok("Invalid username and Password");
-            }
-            return Ok(response);
+            return Unauthorized();
         }
+        
 
+        [HttpPost("signup")]
+        public async Task<ActionResult> Signup(LoginDTO model)
+        {
+
+            if (await _loginRepository.CreateUserAsync(model.UserName, model.Password))
+            {
+                return Ok("User created successfully");
+            }
+            return Conflict("Username already exists");
+        }
 
     }
 }
-
+       

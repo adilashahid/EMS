@@ -15,22 +15,27 @@ namespace EMS.Web.Controllers
             _logger = logger;
 
         }
-        private string GetAuthTokenFromSession()
-        {
-            return HttpContext.Session.GetString("JWToken");
-        }
+
         private async Task<HttpClient> GetHttpClientWithJwtAsync()
         {
             var httpClient = _httpClientFactory.CreateClient();
-            httpClient.BaseAddress = new Uri("https://localhost:7141/");
 
             // Retrieve JWT token from session
-            string jwtToken = GetAuthTokenFromSession();
-            // Set JWT token in the Authorization header
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+            var token = HttpContext.Session.GetString("JWToken");
+
+            // Check if token exists
+            if (!string.IsNullOrEmpty(token))
+            {
+                // Add token to request headers
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+
+            // Set hardcoded API base URL
+            httpClient.BaseAddress = new Uri("https://localhost:7141/");
 
             return httpClient;
         }
+
         public async Task<IActionResult> Index()
         {
             try
@@ -58,42 +63,15 @@ namespace EMS.Web.Controllers
         }
 
 
-        //public async Task<IActionResult> Index()
-        //{
-        //    try
-        //    {
-        //        using (var httpClient = _httpClientFactory.CreateClient())
-        //        {
-        //            httpClient.BaseAddress = new Uri("https://localhost:7141/");
-        //            HttpResponseMessage respose = await httpClient.GetAsync("api/TeacherApi/GetTeachers");
-        //            if (respose.IsSuccessStatusCode)
-        //            {
-        //                var responsedata =await respose.Content.ReadAsAsync<List<Teacher>>();
-        //                return View("Index", responsedata);
-        //            }
-        //            else
-        //            {
-        //                return RedirectToAction("Error", "Home");
-        //            }
-
-        //        }
-
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             try
-            {
-                using (var httpClient = _httpClientFactory.CreateClient())
+            
                 {
-                    httpClient.BaseAddress = new Uri("https://localhost:7141/");
-
-                    HttpResponseMessage response = await httpClient.GetAsync($"api/TeacherApi/GetById/{id}");
+                    using (var httpClient = await GetHttpClientWithJwtAsync())
+                    {
+                        HttpResponseMessage response = await httpClient.GetAsync($"api/TeacherApi/GetById/{id}");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -122,12 +100,11 @@ namespace EMS.Web.Controllers
         public async Task<IActionResult> Create(Teacher teacher)
         {
             try
-            {
-                using (var httpClient = _httpClientFactory.CreateClient())
+            
                 {
-                    httpClient.BaseAddress = new Uri("https://localhost:7141/");
-
-                    HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/TeacherApi/CreateTeachers", teacher);
+                    using (var httpClient = await GetHttpClientWithJwtAsync())
+                    {
+                        HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/TeacherApi/CreateTeachers", teacher);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -150,9 +127,9 @@ namespace EMS.Web.Controllers
         {
             try
             {
-                using (var httpClient = _httpClientFactory.CreateClient())
+                using (var httpClient = await GetHttpClientWithJwtAsync())
                 {
-                    httpClient.BaseAddress = new Uri("https://localhost:7141/");
+                   
 
                     HttpResponseMessage response = await httpClient.GetAsync($"api/TeacherApi/GetById/{id}");
 
@@ -181,10 +158,8 @@ namespace EMS.Web.Controllers
        {
             try
             {
-                using (var httpClient = _httpClientFactory.CreateClient())
+                using (var httpClient = await GetHttpClientWithJwtAsync())
                 {
-                    httpClient.BaseAddress = new Uri("https://localhost:7141/");
-
                     HttpResponseMessage response = await httpClient.PutAsJsonAsync("api/TeacherApi/UpdateTeachers", teacher);
 
                     if (response.IsSuccessStatusCode)
@@ -209,10 +184,8 @@ namespace EMS.Web.Controllers
         {
             try
             {
-                using (var httpClient = _httpClientFactory.CreateClient())
+                using (var httpClient = await GetHttpClientWithJwtAsync())
                 {
-                    httpClient.BaseAddress = new Uri("https://localhost:7141/");
-
                     HttpResponseMessage response = await httpClient.DeleteAsync($"api/TeacherApi/DeleteTeacher?id={id}");
 
                     if (response.IsSuccessStatusCode)

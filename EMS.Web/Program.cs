@@ -1,14 +1,18 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Text;
+//using EMS.Web.Services;
+
+using ems.web.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddHttpContextAccessor();
 
-        
+
+builder.Services.AddScoped<JwtTokenService>();
+
+//// Assuming you have the jwtSecret stored in configuration
+//var jwtSecret = builder.Configuration["JwtSecret"]; // Ensure JwtSecret is defined in your appsettings.json or environment variables
+//builder.Services.AddSingleton(jwtSecret);
 
 builder.Services.AddControllersWithViews();
 
