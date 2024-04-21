@@ -41,6 +41,10 @@ namespace EMS.DAL.Repository
             await _context.SaveChangesAsync();
             return student.RollNo;
         }
+        public async Task Commit()
+        {
+            await _context.SaveChangesAsync();
+        }
         public async Task<bool> DeleteStudentAsync(Student student) 
         {
             _context.Remove(student);

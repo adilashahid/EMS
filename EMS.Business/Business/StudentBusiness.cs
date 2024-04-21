@@ -27,21 +27,9 @@ namespace EMS.Business.Business
         }
         public async Task<int> CreatedStudent(Student student)
         {
-            Student newStudent = new Student
-            {
-                RollNo = student.RollNo,
-                Name = student.Name,
-                FatherName = student.FatherName,
-                ClassName = student.ClassName,
-                Address = student.Address,
-                MobileNo = student.MobileNo,
-                DOB = student.DOB,
-                Email = student.Email,
-                Fee = student.Fee,
-            };
 
-            await _studentRepository.CreateAsync(newStudent); 
-           return newStudent.RollNo;
+            await _studentRepository.CreateAsync(student); 
+           return student.RollNo;
         }
         
         public async Task<int> UpdateStudent(Student student)
@@ -60,7 +48,7 @@ namespace EMS.Business.Business
             existingstudent.DOB = student.DOB;
             existingstudent.Email = student.Email;
             existingstudent.Fee = student.Fee;
-            await _studentRepository.UpdateAsync(existingstudent);
+            await _studentRepository.Commit();
             return existingstudent.RollNo;
         }
         public async Task<bool> DeleteStudentAsync(Student student)

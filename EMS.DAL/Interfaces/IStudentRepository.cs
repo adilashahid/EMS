@@ -11,6 +11,7 @@ namespace EMS.DAL.Interfaces
         Task<int> CreateAsync(Student student);
         Task<int> UpdateAsync(Student student);
         Task<bool> DeleteStudentAsync(Student student);
+        Task Commit();
 
     }
 }

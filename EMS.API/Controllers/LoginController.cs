@@ -1,6 +1,6 @@
 ﻿using EMS.DAL.Interfaces;
 using EMS.DAL.Repository;
-using EMS.Entities.Models;
+using EMS.Entities.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

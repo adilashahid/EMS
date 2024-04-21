@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EMS.Entities.Models
+namespace EMS.Entities.DTO
 {
     public class LoginResponseDTO
     {

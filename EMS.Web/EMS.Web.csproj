@@ -12,8 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EMS.DAL\EMS.DAL.csproj" />
     <ProjectReference Include="..\EMS.Entities\EMS.Entities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\ViewModel\" />
   </ItemGroup>
 
 </Project>

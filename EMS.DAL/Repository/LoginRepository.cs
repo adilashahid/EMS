@@ -15,7 +15,7 @@ namespace EMS.DAL.Repository
         public async Task<bool> AuthenticateAsync(string username, string password)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            if (user != null && password == user.PasswordHash)
             {
                 return true;
             }
@@ -28,11 +28,11 @@ namespace EMS.DAL.Repository
                 return false; // User with this username already exists
             }
 
-            // Hash the password using a secure password hashing algorithm (e.g., BCrypt)
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+            //// Hash the password using a secure password hashing algorithm (e.g., BCrypt)
+            //string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
             // Save the user to the database
-            var user = new User { Username = username, PasswordHash = hashedPassword };
+            var user = new User { Username = username, PasswordHash = password };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 

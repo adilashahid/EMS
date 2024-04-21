@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EMS.Entities
+namespace EMS.Entities.Models
 {
     public class User
     {

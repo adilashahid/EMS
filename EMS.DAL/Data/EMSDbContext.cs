@@ -1,5 +1,4 @@
-﻿using EMS.Entities;
-using EMS.Entities.Models;
+﻿using EMS.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMS.DAL.Data
