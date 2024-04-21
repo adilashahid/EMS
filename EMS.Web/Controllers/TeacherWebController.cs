@@ -1,47 +1,32 @@
-﻿using EMS.Entities.Models;
+﻿using ems.web.services;
+using EMS.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Net.Http.Headers;
-
 namespace EMS.Web.Controllers
 {
     public class TeacherWebController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConfiguration _configuration;
+        private readonly JwtTokenService _jwtTokenService;
         private readonly ILogger<TeacherWebController> _logger;
-        public TeacherWebController(IHttpClientFactory httpClientFactory, ILogger<TeacherWebController> logger)
+
+        public TeacherWebController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, JwtTokenService jwtTokenService, ILogger<TeacherWebController> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _httpContextAccessor = httpContextAccessor;
+            _configuration = configuration;
+            _jwtTokenService = jwtTokenService;
             _logger = logger;
-
         }
-
-        private async Task<HttpClient> GetHttpClientWithJwtAsync()
-        {
-            var httpClient = _httpClientFactory.CreateClient();
-
-            // Retrieve JWT token from session
-            var token = HttpContext.Session.GetString("JWToken");
-
-            // Check if token exists
-            if (!string.IsNullOrEmpty(token))
-            {
-                // Add token to request headers
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            }
-
-            // Set hardcoded API base URL
-            httpClient.BaseAddress = new Uri("https://localhost:7141/");
-
-            return httpClient;
-        }
+       
 
         public async Task<IActionResult> Index()
         {
             try
             
             {
-                using (var httpClient = await GetHttpClientWithJwtAsync())
+                using (var httpClient = await _jwtTokenService.GetHttpClientWithJwtAsync())
                 {
                     httpClient.BaseAddress = new Uri("https://localhost:7141/");
                     HttpResponseMessage respose = await httpClient.GetAsync("api/TeacherApi/GetTeachers");
@@ -69,7 +54,7 @@ namespace EMS.Web.Controllers
             try
             
                 {
-                    using (var httpClient = await GetHttpClientWithJwtAsync())
+                    using (var httpClient = await _jwtTokenService.GetHttpClientWithJwtAsync())
                     {
                         HttpResponseMessage response = await httpClient.GetAsync($"api/TeacherApi/GetById/{id}");
 
@@ -102,7 +87,7 @@ namespace EMS.Web.Controllers
             try
             
                 {
-                    using (var httpClient = await GetHttpClientWithJwtAsync())
+                    using (var httpClient = await _jwtTokenService.GetHttpClientWithJwtAsync())
                     {
                         HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/TeacherApi/CreateTeachers", teacher);
 
@@ -127,7 +112,7 @@ namespace EMS.Web.Controllers
         {
             try
             {
-                using (var httpClient = await GetHttpClientWithJwtAsync())
+                using (var httpClient = await _jwtTokenService.GetHttpClientWithJwtAsync())
                 {
                    
 
@@ -158,7 +143,7 @@ namespace EMS.Web.Controllers
        {
             try
             {
-                using (var httpClient = await GetHttpClientWithJwtAsync())
+                using (var httpClient = await _jwtTokenService.GetHttpClientWithJwtAsync())
                 {
                     HttpResponseMessage response = await httpClient.PutAsJsonAsync("api/TeacherApi/UpdateTeachers", teacher);
 
@@ -184,7 +169,7 @@ namespace EMS.Web.Controllers
         {
             try
             {
-                using (var httpClient = await GetHttpClientWithJwtAsync())
+                using (var httpClient = await _jwtTokenService.GetHttpClientWithJwtAsync())
                 {
                     HttpResponseMessage response = await httpClient.DeleteAsync($"api/TeacherApi/DeleteTeacher?id={id}");
 

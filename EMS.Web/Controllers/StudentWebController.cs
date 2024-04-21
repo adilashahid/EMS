@@ -1,4 +1,6 @@
-﻿using ems.web.services;
+﻿using Azure;
+using ems.web.services;
+using EMS.Entities.Models;
 using EMS.Web.Models;
 //using EMS.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,15 +15,16 @@ namespace EMS.Web.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
         private readonly JwtTokenService _jwtTokenService;
+        private readonly ILogger<StudentWebController> _logger;
 
-        public StudentWebController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, JwtTokenService jwtTokenService)
+        public StudentWebController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, JwtTokenService jwtTokenService, ILogger<StudentWebController> logger)
         {
             _httpClientFactory = httpClientFactory;
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
             _jwtTokenService = jwtTokenService;
+            _logger = logger;
         }
-
 
 
 
@@ -69,17 +72,18 @@ namespace EMS.Web.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
+                        // Redirect to index action after successful creation
                         return RedirectToAction(nameof(Index));
                     }
                     else
                     {
-                        return View("Error");
+                        return RedirectToAction("Error", "Home");
                     }
                 }
             }
             catch (Exception ex)
             {
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
         public async Task<IActionResult> Details(int rollno)
@@ -93,32 +97,18 @@ namespace EMS.Web.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var responseData = await response.Content.ReadAsAsync<Student>();
-                        if (responseData != null)
-                        {
-                            return View(responseData);
-                        }
-                        else
-                        {
-                            // Handle null response data
-                            return View("Error");
-                        }
+                        return View(responseData);
                     }
                     else
                     {
-                        // Handle non-success status code
-                        return View("Error");
+                        return RedirectToAction("Error", "Home");
                     }
                 }
             }
-            catch (HttpRequestException ex)
-            {
-                
-                return View("Error");
-            }
             catch (Exception ex)
             {
-              
-                return View("Error");
+                _logger.LogError(ex, "An error occurred while retrieving teacher details.");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -129,9 +119,7 @@ namespace EMS.Web.Controllers
             {
                 using (var httpClient = await _jwtTokenService.GetHttpClientWithJwtAsync())
                 {
-
                     HttpResponseMessage response = await httpClient.GetAsync($"api/StudentApi/GetStudentsByIdAsnc/{rollno}");
-
                     if (response.IsSuccessStatusCode)
                     {
                         var responseData = await response.Content.ReadAsAsync<Student>();
@@ -139,15 +127,14 @@ namespace EMS.Web.Controllers
                     }
                     else
                     {
-                        // Handle error
-                        return View("Error");
+                        return RedirectToAction("Error", "Home");
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Log the exception and handle it appropriately
-                return View("Error");
+                _logger.LogError(ex, "An error occurred while retrieving teacher for editing.");
+                return RedirectToAction("Error", "Home");
             }
         }
         // POST: StudentWeb/Update
@@ -159,23 +146,20 @@ namespace EMS.Web.Controllers
                 using (var httpClient = await _jwtTokenService.GetHttpClientWithJwtAsync())
                 {
                     HttpResponseMessage response = await httpClient.PutAsJsonAsync("api/StudentApi/UpdateStudent", student);
-
                     if (response.IsSuccessStatusCode)
                     {
-                        // Redirect to index action after successful update
-                        return RedirectToAction(nameof(Index));
+                        return RedirectToAction("Index");
                     }
                     else
                     {
-                        // Handle error
-                        return View("Error");
+                        return RedirectToAction("Error", "Home");
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Log the exception and handle it appropriately
-                return View("Error");
+                _logger.LogError(ex, "An error occurred while updating the teacher.");
+                return RedirectToAction("Error", "Home");
             }
         }
         [HttpPost]
@@ -189,21 +173,24 @@ namespace EMS.Web.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        // Redirect to index action after successful deletion
-                        return RedirectToAction(nameof(Index));
+                        return RedirectToAction("Index");
                     }
                     else
                     {
-                        return View("Error");
+                        // Log the error response
+                        _logger.LogError("Delete action failed with status code {StatusCode}", response.StatusCode);
+                        return RedirectToAction("Error", "Home");
                     }
                 }
             }
             catch (Exception ex)
             {
-                return View("Error");
+                // Log the exception
+                _logger.LogError(ex, "An error occurred while deleting the teacher.");
+                return RedirectToAction("Error", "Home");
             }
         }
 
+
     }
 }
-
