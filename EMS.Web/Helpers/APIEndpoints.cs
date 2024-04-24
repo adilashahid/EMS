@@ -11,4 +11,13 @@ public class APIEndpoints
         public static string DeleteStudent(int rollNo) => $"{baseURL}api/StudentApi/DeleteStudent/{rollNo}";
         public static string GetStudentsById(int rollNo) => $"{baseURL}api/StudentApi/GetStudentsByIdAsnc/{rollNo}";
     }
+    public static class Teachers
+    {
+        public static string GetTeachers = $"{baseURL}api/TeacherApi/GetTeachers";
+        public static string CreateTeachers = $"{baseURL}api/TeacherApi/CreateTeachers";
+        public static string UpdateTeachers = $"{baseURL}api/TeacherApi/UpdateTeachers";
+        public static string DeleteTeacher(int id) => $"{baseURL}api/TeacherApi/DeleteTeacher?id={id}";
+        public static string GetTeacherById(int id) => $"{baseURL}api/TeacherApi/GetById/{id}";
+
+    }
 }

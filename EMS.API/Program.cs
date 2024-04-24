@@ -51,6 +51,7 @@ builder.Services.AddDbContext<EMSDbContext>(options =>
 #region Businesses servcies
 builder.Services.AddTransient<IStudentBusiness, StudentBusiness>();
 builder.Services.AddTransient<ITeacherBusiness, TeacherBusiness>();
+builder.Services.AddTransient<ILoginBusiness, LoginBusiness>();
 #endregion
 
 

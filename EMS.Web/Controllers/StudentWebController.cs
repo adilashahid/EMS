@@ -135,9 +135,9 @@ namespace EMS.Web.Controllers
             {
                 var token = HttpContext.Session.GetString("JWToken");
                 var studentDeleteResp = await HttpClientHelper.SendHttpRequest<object, bool>(APIEndpoints.Students
-                    .GetStudentsById(rollno), HttpMethod.Delete, null, token);
+                    .DeleteStudent(rollno), HttpMethod.Delete, null, token);
 
-                if (!studentDeleteResp)
+                if (studentDeleteResp)
                 {
                     return RedirectToAction(nameof(Index));
                 }

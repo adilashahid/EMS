@@ -42,6 +42,7 @@ public static class HttpClientHelper
 
             using (HttpClient client = new(handler))
             {
+                client.BaseAddress = new Uri("https://localhost:7141/");
                 response = await client.SendAsync(request);
             }
 

@@ -1,6 +1,7 @@
 ﻿using EMS.DAL.Data;
 using EMS.DAL.Interfaces;
 using EMS.Entities;
+using EMS.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMS.DAL.Repository
@@ -12,27 +13,20 @@ namespace EMS.DAL.Repository
         {
             _context = context;
         }
-        public async Task<bool> AuthenticateAsync(string username, string password)
+        public async Task<User> LoginAsync(string username, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-            if (user != null && password == user.PasswordHash)
-            {
-                return true;
-            }
-            return false;
+           return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            
         }
-        public async Task<bool> CreateUserAsync(string username, string password)
+        public async Task<bool> SignupAsync(string username, string password)
         {
             if (await _context.Users.AnyAsync(u => u.Username == username))
             {
                 return false; // User with this username already exists
             }
 
-            //// Hash the password using a secure password hashing algorithm (e.g., BCrypt)
-            //string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-
             // Save the user to the database
-            var user = new User { Username = username, PasswordHash = password };
+            var user = new User { Username = username, Password = password };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
@@ -41,15 +35,6 @@ namespace EMS.DAL.Repository
 
 
 
-        private string HashPassword(string password)
-        {
-            return password;
-        }
 
-        private bool VerifyPassword(string inputPassword, string hashedPassword)
-        {
-
-            return inputPassword == hashedPassword;
-        }
     }
 }
